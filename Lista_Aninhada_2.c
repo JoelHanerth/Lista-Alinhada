@@ -32,7 +32,7 @@ typedef struct tipoGrade {
 	 struct tipoGrade *prox;	
 }TGrade;
 
-typedef struct tipoCurso {
+typedef struct tipoCurso { //nome curso
 	string nome;
 	struct tipoCurso *ante;
 	struct tipoCurso *prox;
@@ -81,11 +81,15 @@ int menu(){
 	printf("\t6 - Excluir PRE-REQUISITO de DISCIPLINA.\n\n");
 	printf("\t7 - Registrar GRADE CURRICULAR para CURSO.\n");
 	printf("\t8 - Excluir item da GRADE CURRICULAR de CURSO.\n\n");
+	printf("\t9 - Listar DISCIPLINAS.\n");
+	printf("\t10- Listar CURSOS.\n");
+	printf("\t11- Listar PRE_REQUISITOS de DISCIPLINA especifica.\n");
+	printf("\t12- Listar GRADE CURRICULAR de CURSO especifico.\n\n");
 	
 	printf("\t\tInforme a OPCAO desejada: ");
 	scanf("%d", &opcao);
 	
-	if((opcao < 0) || (opcao > 8)){
+	if((opcao < 0) || (opcao > 12)){
 		printf("\n\n\n\tERRO: OPCAO invalida!\n\tTente Novamente\n\n");
 		system("PAUSE");
 	}//if
