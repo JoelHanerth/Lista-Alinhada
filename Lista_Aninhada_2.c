@@ -18,11 +18,11 @@ typedef struct tipoDisciplina {
 	int cargaHoraria;
 	struct tipoDisciplina *prox;
 	struct tipoDisciplina *ant;
-	struct TPreRequisito *preRequisitos;	
+	struct tipoPreRequisito *preRequisitos;	
 }TDisciplina;
 
 typedef struct tipoPreRequisito {
-	TDisciplina *preRequisito;
+	TDisciplina *disciplina;
 	struct tipoPreRequisito *prox;
 }TPreRequisito;
 
@@ -52,8 +52,30 @@ void inicializa(TLista *L){
 	L->disciplinas = NULL;	
 }
 
-void cadastroDisciplinas(TDisciplina *D){
-	TDisciplina *novo, *atual;
+void listarDisciplinas(TLista list) {
+	TDisciplina *current = list.disciplinas;
+	int i;
+
+	for ( i = 0; current != NULL; i++){
+		printf("%d - %s\n", i,current->nome);
+        current = current->prox;
+	}
+	printf("\n");
+}
+
+TDisciplina *buscarDisciplinaIndex(TLista list, int index){
+	TDisciplina *current = list.disciplinas;
+	int i;
+
+	for ( i = 0; (i != index && current != NULL); i++){
+        current = current->prox;
+	}
+
+	return current;
+}
+
+void cadastroDisciplinas(TLista *list){
+	TDisciplina *novo;
 	printf("\n\n\t\t=======| Cadastro de DISCILINAS|=======\n\n");
 
 	novo = (TDisciplina *)malloc(sizeof(TDisciplina));
@@ -62,11 +84,15 @@ void cadastroDisciplinas(TDisciplina *D){
 	novo->preRequisitos = NULL;
 
 	printf("\tInforme o nome da Disciplina: ");
-	scanf("%49[^\n]s", novo->nome);
+	scanf(" %49[^\n]s", novo->nome);
 	printf("\tInforme a carga horária da disciplina em Horas: ");
-	scanf("%d", novo->cargaHoraria);
+	scanf("%d", &novo->cargaHoraria);
 
 }
+
+
+
+
 //================================================================
 int menu(){
 	int opcao;
@@ -107,6 +133,7 @@ int main(){
 		
 		switch(opcao){
 			case 1:
+				cadastroDisciplinas(&lista);
 				break;
 			case 2:
 				break;
