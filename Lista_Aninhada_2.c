@@ -57,8 +57,19 @@ void listarDisciplinas(TLista list) {
 	int i;
 
 	for ( i = 0; current != NULL; i++){
-		printf("%d - %s\n", i,current->nome);
+		printf("%d - %s - (%d horas)\n", i+1,current->nome, current->cargaHoraria);
         current = current->prox;
+	}
+	printf("\n");
+}
+
+void listarCursos(TLista list) {
+	TCurso *current = list.cursos;
+	int i;
+
+	for ( i = 0; current != NULL; i++){
+		printf("%d - %s\n", i+1,current->nome);
+		current = current->prox;
 	}
 	printf("\n");
 }
@@ -75,28 +86,123 @@ TDisciplina *buscarDisciplinaIndex(TLista list, int index){
 }
 
 void cadastroDisciplinas(TLista *list){
-	TDisciplina *novo;
+	TDisciplina *novo, *atual;
 	printf("\n\n\t\t=======| Cadastro de DISCILINAS|=======\n\n");
 
 	novo = (TDisciplina *)malloc(sizeof(TDisciplina));
 	novo->ant = NULL;
 	novo->prox = NULL;
-	novo->preRequisitos = NULL;
 
 	printf("\tInforme o nome da Disciplina: ");
 	scanf(" %49[^\n]s", novo->nome);
 	printf("\tInforme a carga horária da disciplina em Horas: ");
 	scanf("%d", &novo->cargaHoraria);
 
+	atual = list->disciplinas;			
+
+	if(atual == NULL){
+		//Lista vazia.
+		list->disciplinas = novo;		
+	} else {
+		//Lista com pelo menos uma disciplina.
+		while(atual->prox != NULL){
+			atual = atual->prox;
+		}//while
+		atual->prox = novo;
+	}
+
+	listarDisciplinas(*list);
+	printf("\n\n\tDisciplina cadastrada com sucesso!\n\n");
+
+}
+void excluirDisciplina(TLista *list){
+	TDisciplina *atual = list->disciplinas;
+	TDisciplina *anterior = NULL;
+	int i, index;
+
+	listarDisciplinas(*list);
+	printf("\n\n\tInforme o indice da disciplina a ser excluida: ");
+	scanf("%d", &index);
+	index--;
+
+	if (index == 0) {
+		list->disciplinas = atual->prox;
+		free(atual);
+	} else {
+		for (i = 0; i < index && atual != NULL; i++) {
+			anterior = atual;
+			atual = atual->prox;
+		}
+		if (atual != NULL) {
+			anterior->prox = atual->prox;
+			free(atual);
+		}
+	}
+	printf("\n\n\tDisciplina excluida com sucesso!\n\n");
+	listarDisciplinas(*list);
 }
 
+void cadastroCursos(TLista *list){
+	TCurso *novo, *atual;
+	printf("\n\n\t\t=======| Cadastro de CURSOS |=======\n\n");
 
+	novo = (TCurso *)malloc(sizeof(TCurso));
+	novo->ante = NULL;
+	novo->prox = NULL;
+
+	printf("\tInforme o nome do Curso: ");
+	scanf(" %49[^\n]s", novo->nome);
+
+	atual = list->cursos;			
+
+	if(atual == NULL){
+		//Lista vazia.
+		list->cursos = novo;		
+	} else {
+		//Lista com pelo menos um curso.
+		while(atual->prox != NULL){
+			atual = atual->prox;
+		}//while
+		atual->prox = novo;
+	}
+
+	listarCursos(*list);
+	printf("\n\n\tCurso cadastrado com sucesso!\n\n");
+}
+
+void excluirCurso(TLista *list){
+	TCurso *atual = list->cursos;
+	TCurso *anterior = NULL;
+	int i, index;
+
+	listarCursos(*list);
+	printf("\n\n\tInforme o indice do curso a ser excluido: ");
+	scanf("%d", &index);
+
+	index--;
+
+	if (index == 0) {
+		list->cursos = atual->prox;
+		free(atual);
+	} else {
+		for (i = 0; i < index && atual != NULL; i++) {
+			anterior = atual;
+			atual = atual->prox;
+		}
+		if (atual != NULL) {
+			anterior->prox = atual->prox;
+			free(atual);
+		}
+	}
+
+	printf("\n\n\tCurso excluido com sucesso!\n\n");
+}
 
 
 //================================================================
 int menu(){
 	int opcao;
-	system("CLS");
+	//system("CLS");
 	printf("\n\n\n\t\t=======| MENU |=======\n\n");
 	printf("\t0 - SAIR (Encerrar Aplicacao).\n\n");
 	printf("\t1 - Inserir DISCIPLINAS.\n");
@@ -136,13 +242,33 @@ int main(){
 				cadastroDisciplinas(&lista);
 				break;
 			case 2:
+				excluirDisciplina(&lista);
 				break;
 			case 3:
+				cadastroCursos(&lista);
 				break;
 			case 4:
+				excluirCurso(&lista);
 				break;
 			case 5: 
 				break;
+			case 6:
+				break;
+			case 7:
+				break;
+			case 8:
+				break;
+			case 9:
+				listarDisciplinas(lista);
+				break;
+			case 10:
+				listarCursos(lista);
+				break;
+			case 11:
+				break;
+			case 12:
+				break;
+
 		}//switch
 		
 	}while(opcao != 0);
