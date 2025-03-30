@@ -198,6 +198,89 @@ void excluirCurso(TLista *list){
 	printf("\n\n\tCurso excluido com sucesso!\n\n");
 }
 
+void registrarPreRequisitos(TLista *list) {
+    int disciplinaIndex, preRequisitoIndex;
+    TDisciplina *disciplina, *preRequisito;
+    TPreRequisito *novoPreRequisito, *atualPreReq;
+
+    listarDisciplinas(*list);
+	
+    printf("\n\n\tInforme o índice da disciplina que deseja inserir o pré-requisito: ");
+    scanf("%d", &disciplinaIndex);
+    disciplinaIndex--;
+
+    disciplina = buscarDisciplinaIndex(*list, disciplinaIndex);
+    if (disciplina == NULL) {
+        printf("\n\n\tERRO: Disciplina não encontrada!\n\n");
+        return;
+    }
+
+    listarDisciplinas(*list);
+    printf("\n\n\tInforme o índice do pré-requisito: ");
+    scanf("%d", &preRequisitoIndex);
+    preRequisitoIndex--;
+
+    preRequisito = buscarDisciplinaIndex(*list, preRequisitoIndex);
+    if (preRequisito == NULL) {
+        printf("\n\n\tERRO: Pré-requisito não encontrado!\n\n");
+        return;
+    }
+
+    if (disciplina == preRequisito) {
+        printf("\n\n\tERRO: Uma disciplina não pode ser pré-requisito dela mesma!\n\n");
+        return;
+    }
+
+    novoPreRequisito = (TPreRequisito *)malloc(sizeof(TPreRequisito));
+    novoPreRequisito->disciplina = preRequisito;
+    novoPreRequisito->prox = NULL;
+
+    if (disciplina->preRequisitos == NULL) {
+        disciplina->preRequisitos = novoPreRequisito;
+    } else {
+        atualPreReq = disciplina->preRequisitos;
+        while (atualPreReq->prox != NULL) {
+            atualPreReq = atualPreReq->prox;
+        }
+        atualPreReq->prox = novoPreRequisito;
+    }
+
+    printf("\n\n\tPré-requisito adicionado com sucesso!\n\n");
+}
+
+void listarPreRequisitos(TLista list) {
+    int disciplinaIndex;
+    TDisciplina *disciplina;
+    TPreRequisito *atualPreReq;
+
+    listarDisciplinas(list);
+    printf("\n\n\tInforme o índice da disciplina para visualizar os pré-requisitos: ");
+    scanf("%d", &disciplinaIndex);
+    disciplinaIndex--;
+
+    disciplina = buscarDisciplinaIndex(list, disciplinaIndex);
+    if (disciplina == NULL) {
+        printf("\n\n\tERRO: Disciplina não encontrada!\n\n");
+        return;
+    }
+
+    printf("\n\nPré-requisitos da disciplina '%s':\n", disciplina->nome);
+    if (disciplina->preRequisitos == NULL) {
+        printf("\tNenhum pré-requisito cadastrado.\n");
+        return;
+    }
+
+    atualPreReq = disciplina->preRequisitos;
+    int i = 1;
+    while (atualPreReq != NULL) {
+        printf("\t%d - %s\n", i++, atualPreReq->disciplina->nome);
+        atualPreReq = atualPreReq->prox;
+    }
+    printf("\n");
+}
+
+
+
 
 //================================================================
 int menu(){
@@ -251,6 +334,7 @@ int main(){
 				excluirCurso(&lista);
 				break;
 			case 5: 
+				registrarPreRequisitos(&lista);
 				break;
 			case 6:
 				break;
@@ -265,6 +349,7 @@ int main(){
 				listarCursos(lista);
 				break;
 			case 11:
+				listarPreRequisitos(lista);
 				break;
 			case 12:
 				break;
