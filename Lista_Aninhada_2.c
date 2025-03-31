@@ -74,16 +74,17 @@ void listarCursos(TLista list) {
 	printf("\n");
 }
 
-TDisciplina *buscarDisciplinaIndex(TLista list, int index){
-	TDisciplina *current = list.disciplinas;
-	int i;
+TDisciplina *buscarDisciplinaIndex(TLista list, int index) {
+    TDisciplina *current = list.disciplinas;
+    int i;
 
-	for ( i = 0; (i != index && current != NULL); i++){
+    for (i = 0; current != NULL && i < index; i++) {
         current = current->prox;
-	}
+    }
 
-	return current;
+    return current;
 }
+
 
 void cadastroDisciplinas(TLista *list){
 	TDisciplina *novo, *atual;
@@ -210,10 +211,13 @@ void registrarPreRequisitos(TLista *list) {
     disciplinaIndex--;
 
     disciplina = buscarDisciplinaIndex(*list, disciplinaIndex);
+
     if (disciplina == NULL) {
         printf("\n\n\tERRO: Disciplina não encontrada!\n\n");
         return;
     }
+
+    printf("\n\n\tDisciplina selecionada: %s\n", disciplina->nome);
 
     listarDisciplinas(*list);
     printf("\n\n\tInforme o índice do pré-requisito: ");
@@ -221,34 +225,55 @@ void registrarPreRequisitos(TLista *list) {
     preRequisitoIndex--;
 
     preRequisito = buscarDisciplinaIndex(*list, preRequisitoIndex);
+
     if (preRequisito == NULL) {
         printf("\n\n\tERRO: Pré-requisito não encontrado!\n\n");
         return;
     }
+
+    printf("\n\n\tPré-requisito selecionado: %s\n", preRequisito->nome);
 
     if (disciplina == preRequisito) {
         printf("\n\n\tERRO: Uma disciplina não pode ser pré-requisito dela mesma!\n\n");
         return;
     }
 
+    // Criar novo nó de pré-requisito
+	printf("\n\n\tAdicionando pré-requisito...\n");
     novoPreRequisito = (TPreRequisito *)malloc(sizeof(TPreRequisito));
+
+	printf("\n\n\tmalloc criado\n\n");
+
+    if (novoPreRequisito == NULL) {
+        printf("\n\n\tERRO: Falha na alocação de memória!\n\n");
+        return;
+    }
+    
+	printf("\n\n\tpre requisito == null\n\n");
+
     novoPreRequisito->disciplina = preRequisito;
     novoPreRequisito->prox = NULL;
 
+	printf("\n\n\tpre requisito->prox == null\n\n");
+
     if (disciplina->preRequisitos == NULL) {
         disciplina->preRequisitos = novoPreRequisito;
+		printf("\n\n\tIF I\n\n");
     } else {
         atualPreReq = disciplina->preRequisitos;
+		printf("\n\n\tELSE I\n\n");// está parando aqui !!!!
         while (atualPreReq->prox != NULL) {
             atualPreReq = atualPreReq->prox;
         }
+		printf("\n\n\tWHILE\n\n");
         atualPreReq->prox = novoPreRequisito;
     }
 
     printf("\n\n\tPré-requisito adicionado com sucesso!\n\n");
 }
 
-void listarPreRequisitos(TLista list) {
+
+void listarPreRequisitos(TLista list) { // ainda não testado
     int disciplinaIndex;
     TDisciplina *disciplina;
     TPreRequisito *atualPreReq;
