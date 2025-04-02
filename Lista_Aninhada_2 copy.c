@@ -119,6 +119,7 @@ void cadastroDisciplinas(TLista *list){
 		while(atual->prox != NULL){
 			atual = atual->prox;
 		}
+		novo->ant = atual;
 		atual->prox = novo;
 	}
 
@@ -147,6 +148,7 @@ void cadastroDisciplinas2(TLista *list, char nome[100], int carga){
 		while(atual->prox != NULL){
 			atual = atual->prox;
 		}
+		novo->ant = atual;
 		atual->prox = novo;
 	}
 }
@@ -168,15 +170,21 @@ void excluirDisciplina(TLista *list){
 		for (i = 0; i < index && atual != NULL; i++) {
 			atual = atual->prox;
 		}
-		if (atual != NULL) {
-			atual->ant->prox = atual->prox;
-			free(atual);
-		}
-		else{
+		if (atual == NULL){
 			printf("\n\t═══════════════════════════════════════════\n");
 			printf("\t✔ Disciplina não encontrada!\n");
 			printf("\t═══════════════════════════════════════════\n\n");
 			return;
+
+		}
+		if (atual->prox == NULL){
+			atual->ant->prox = NULL;
+			free(atual);
+		}
+		else{
+			atual->ant->prox = atual->prox;
+			atual->prox->ant = atual->ant;
+			free(atual);
 		}
 	}
 
