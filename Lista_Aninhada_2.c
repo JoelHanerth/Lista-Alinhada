@@ -10,6 +10,7 @@
 */
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 typedef char string[40];
 
@@ -93,6 +94,7 @@ void cadastroDisciplinas(TLista *list){
 	novo = (TDisciplina *)malloc(sizeof(TDisciplina));
 	novo->ant = NULL;
 	novo->prox = NULL;
+	novo->preRequisitos = NULL;
 
 	printf("\tInforme o nome da Disciplina: ");
 	scanf(" %49[^\n]s", novo->nome);
@@ -116,6 +118,37 @@ void cadastroDisciplinas(TLista *list){
 	printf("\n\n\tDisciplina cadastrada com sucesso!\n\n");
 
 }
+
+void cadastroDisciplinas2(TLista *list, char nome[100], int carga){
+	TDisciplina *novo, *atual;
+	printf("\n\n\t\t=======| Cadastro de DISCILINAS|=======\n\n");
+
+	novo = (TDisciplina *)malloc(sizeof(TDisciplina));
+	novo->ant = NULL;
+	novo->prox = NULL;
+	novo->preRequisitos = NULL;
+
+	strcpy(novo->nome, nome);
+	novo->cargaHoraria = carga;
+
+	atual = list->disciplinas;			
+
+	if(atual == NULL){
+		//Lista vazia.
+		list->disciplinas = novo;		
+	} else {
+		//Lista com pelo menos uma disciplina.
+		while(atual->prox != NULL){
+			atual = atual->prox;
+		}//while
+		atual->prox = novo;
+	}
+
+	listarDisciplinas(*list);
+	printf("\n\n\tDisciplina cadastrada com sucesso!\n\n");
+
+}
+
 void excluirDisciplina(TLista *list){
 	TDisciplina *atual = list->disciplinas;
 	TDisciplina *anterior = NULL;
@@ -150,9 +183,38 @@ void cadastroCursos(TLista *list){
 	novo = (TCurso *)malloc(sizeof(TCurso));
 	novo->ante = NULL;
 	novo->prox = NULL;
+	novo->gradeCurricular = NULL;
 
 	printf("\tInforme o nome do Curso: ");
 	scanf(" %49[^\n]s", novo->nome);
+
+	atual = list->cursos;			
+
+	if(atual == NULL){
+		//Lista vazia.
+		list->cursos = novo;		
+	} else {
+		//Lista com pelo menos um curso.
+		while(atual->prox != NULL){
+			atual = atual->prox;
+		}//while
+		atual->prox = novo;
+	}
+
+	listarCursos(*list);
+	printf("\n\n\tCurso cadastrado com sucesso!\n\n");
+}
+
+void cadastroCursos2(TLista *list, char nome[100]){
+	TCurso *novo, *atual;
+	printf("\n\n\t\t=======| Cadastro de CURSOS |=======\n\n");
+
+	novo = (TCurso *)malloc(sizeof(TCurso));
+	novo->ante = NULL;
+	novo->prox = NULL;
+	novo->gradeCurricular = NULL;
+
+	strcpy(novo->nome, nome);
 
 	atual = list->cursos;			
 
@@ -341,6 +403,18 @@ int main(){
 	int opcao;
 
 	inicializa(&lista);
+
+	cadastroDisciplinas2(&lista,"a",60);
+	cadastroDisciplinas2(&lista,"b",90);
+	cadastroDisciplinas2(&lista,"c",120);
+
+	listarDisciplinas(lista);
+
+	cadastroCursos2(&lista, "SI");
+	cadastroCursos2(&lista, "ADM");
+	listarCursos(lista);
+
+
 	
 	do{
 		opcao = menu();
