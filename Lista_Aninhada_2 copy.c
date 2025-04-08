@@ -48,12 +48,30 @@ typedef struct tipoLista {
 
 TLista lista;
 
-//===| Funções |==================================================
+//===| Funções auxiliares |==================================================
 void inicializa(TLista *L){
 	L->cursos = NULL;
 	L->disciplinas = NULL;	
 }
 
+TDisciplina *buscarDisciplinaIndex(TLista list, int index) {
+    TDisciplina *current = list.disciplinas;
+    int i;
+
+    for (i = 0; current != NULL && i < index; i++) {
+        current = current->prox;
+    }
+
+    return current;
+}
+
+TCurso *buscarCursoIndex(TLista list, int index) {
+	TCurso *curso = list.cursos;
+    for (int i = 0; curso != NULL && i < index; i++) {
+        curso = curso->prox;
+    }
+	return curso;
+}
 void listarDisciplinas(TLista list) {
     TDisciplina *current = list.disciplinas;
     int i = 1;
@@ -84,17 +102,52 @@ void listarCursos(TLista list) {
     printf("\t═══════════════════════════════\n\n");
 }
 
-TDisciplina *buscarDisciplinaIndex(TLista list, int index) {
-    TDisciplina *current = list.disciplinas;
-    int i;
+// Função auxiliar para selecionar uma disciplina a partir da lista
+TDisciplina* selecionarDisciplina(TLista *list) {
+    int disciplinaIndex;
+    TDisciplina *disciplina;
 
-    for (i = 0; current != NULL && i < index; i++) {
-        current = current->prox;
+    listarDisciplinas(*list);
+    printf("\n\t► Índice da disciplina: ");
+    scanf("%d", &disciplinaIndex);
+    disciplinaIndex--;
+
+    disciplina = buscarDisciplinaIndex(*list, disciplinaIndex);
+    if (disciplina == NULL) {
+        printf("\n\t═══════════════════════════════════════════\n");
+        printf("\t✘ Erro: Disciplina não encontrada!\n");
+        printf("\t═══════════════════════════════════════════\n\n");
     }
-
-    return current;
+    return disciplina;
 }
 
+// Função auxiliar para selecionar um curso a partir da lista
+TCurso* selecionarCurso(TLista *list) {
+    int cursoIndex;
+    TCurso *curso;
+
+    listarCursos(*list);
+    printf("\n\t► Índice do curso: ");
+    scanf("%d", &cursoIndex);
+    cursoIndex--;
+
+    curso = buscarCursoIndex(*list, cursoIndex);
+    if (curso == NULL) {
+        printf("\n\t═══════════════════════════════════════════\n");
+        printf("\t✘ Erro: Curso não encontrado!\n");
+        printf("\t═══════════════════════════════════════════\n\n");
+    }
+    return curso;
+}
+
+
+
+
+
+
+
+
+//===| Funções Disciplinas |==================================================
 void cadastroDisciplinas(TLista *list){
 	TDisciplina *novo, *atual;
 	printf("\n\n\t\t════════════════════════════\n");
@@ -129,29 +182,6 @@ void cadastroDisciplinas(TLista *list){
 	listarDisciplinas(*list);
 }
 
-void cadastroDisciplinas2(TLista *list, char nome[100], int carga){
-	TDisciplina *novo, *atual;
-
-	novo = (TDisciplina *)malloc(sizeof(TDisciplina));
-	novo->ant = NULL;
-	novo->prox = NULL;
-	novo->preRequisitos = NULL;
-
-	strcpy(novo->nome, nome);
-	novo->cargaHoraria = carga;
-
-	atual = list->disciplinas;			
-
-	if(atual == NULL){
-		list->disciplinas = novo;		
-	} else {
-		while(atual->prox != NULL){
-			atual = atual->prox;
-		}
-		novo->ant = atual;
-		atual->prox = novo;
-	}
-}
 
 void excluirDisciplina(TLista *list){
 	TDisciplina *atual = list->disciplinas;
@@ -194,6 +224,37 @@ void excluirDisciplina(TLista *list){
 	listarDisciplinas(*list);
 }
 
+
+void cadastroDisciplinas2(TLista *list, char nome[100], int carga){
+	TDisciplina *novo, *atual;
+
+	novo = (TDisciplina *)malloc(sizeof(TDisciplina));
+	novo->ant = NULL;
+	novo->prox = NULL;
+	novo->preRequisitos = NULL;
+
+	strcpy(novo->nome, nome);
+	novo->cargaHoraria = carga;
+
+	atual = list->disciplinas;			
+
+	if(atual == NULL){
+		list->disciplinas = novo;		
+	} else {
+		while(atual->prox != NULL){
+			atual = atual->prox;
+		}
+		novo->ant = atual;
+		atual->prox = novo;
+	}
+}
+
+
+
+
+
+
+//===| Funções Curso |==================================================
 void cadastroCursos(TLista *list){
 	TCurso *novo, *atual;
 	printf("\n\n\t\t════════════════════════\n");
@@ -216,6 +277,7 @@ void cadastroCursos(TLista *list){
 		while(atual->prox != NULL){
 			atual = atual->prox;
 		}
+		novo->ante = atual;
 		atual->prox = novo;
 	}
 
@@ -224,6 +286,42 @@ void cadastroCursos(TLista *list){
 	printf("\t═══════════════════════════════════════════\n\n");
 	listarCursos(*list);
 }
+
+void excluirCurso(TLista *list) {
+    TCurso *curso = selecionarCurso(list);
+    if (curso == NULL) {
+        printf("\n\t═══════════════════════════════════════════\n");
+        printf("\t✘ Erro: Curso não encontrado!\n");
+        printf("\t═══════════════════════════════════════════\n\n");
+        return;
+    }
+
+    if (curso->ante != NULL) {
+        curso->ante->prox = curso->prox;
+    } else {
+        // Se é o primeiro nó, atualiza a cabeça da lista
+        list->cursos = curso->prox;
+    }
+
+    if (curso->prox != NULL) {
+        curso->prox->ante = curso->ante;
+    }
+
+    TGrade *gradeAtual = curso->gradeCurricular;
+    while (gradeAtual != NULL) {
+        TGrade *proximaGrade = gradeAtual->prox;
+        free(gradeAtual);
+        gradeAtual = proximaGrade;
+    }
+
+    free(curso);
+
+    printf("\n\t═══════════════════════════════════════════\n");
+    printf("\t✔ Curso excluído com sucesso!\n");
+    printf("\t═══════════════════════════════════════════\n\n");
+    listarCursos(*list);
+}
+
 
 void cadastroCursos2(TLista *list, char nome[100]){
 	TCurso *novo, *atual;
@@ -243,63 +341,24 @@ void cadastroCursos2(TLista *list, char nome[100]){
 		while(atual->prox != NULL){
 			atual = atual->prox;
 		}
+		novo->ante = atual;
 		atual->prox = novo;
 	}
 }
 
-void excluirCurso(TLista *list){
-	TCurso *atual = list->cursos;
-	int i, index;
 
-	listarCursos(*list);
-	printf("\n\t► Índice do curso a excluir: ");
-	scanf("%d", &index);
-	index--;
 
-	if (index == 0 && list->cursos != NULL) {
-		list->cursos = atual->prox;
-		free(atual);
-	} else {
-		for (i = 0; i < index && atual != NULL; i++) {
-			atual = atual->prox;
-		}
-		if (atual != NULL) {
-			atual->ante = atual->prox;
-			printf("aqui");
-			free(atual);
-		}
-		else{
-			printf("\n\t═══════════════════════════════════════════\n");
-			printf("\tX Curso não encontrado\n");
-			printf("\t═══════════════════════════════════════════\n\n");
-			return;
-		}
-	}
 
-	printf("\n\t═══════════════════════════════════════════\n");
-	printf("\t✔ Curso removido com sucesso!\n");
-	printf("\t═══════════════════════════════════════════\n\n");
-}
 
+//===| Funções Pré Requisitos |==================================================
 void registrarPreRequisitos(TLista *list) {
-    int disciplinaIndex, preRequisitoIndex;
+    int preRequisitoIndex;
     TDisciplina *disciplina, *preRequisito;
     TPreRequisito *novoPreRequisito, *atualPreReq;
 
-    listarDisciplinas(*list);
-	
-    printf("\n\t► Índice da disciplina principal: ");
-    scanf("%d", &disciplinaIndex);
-    disciplinaIndex--;
-
-    disciplina = buscarDisciplinaIndex(*list, disciplinaIndex);
-
-    if (disciplina == NULL) {
-        printf("\n\t═══════════════════════════════════════════\n");
-        printf("\t✘ Erro: Disciplina não encontrada!\n");
-        printf("\t═══════════════════════════════════════════\n\n");
+    disciplina = selecionarDisciplina(list);
+    if (disciplina == NULL)
         return;
-    }
 
     listarDisciplinas(*list);
     printf("\n\t► Índice do pré-requisito: ");
@@ -342,22 +401,12 @@ void registrarPreRequisitos(TLista *list) {
 }
 
 void listarPreRequisitos(TLista list) {
-    int disciplinaIndex;
     TDisciplina *disciplina;
     TPreRequisito *atualPreReq;
 
-    listarDisciplinas(list);
-    printf("\n\t► Índice da disciplina: ");
-    scanf("%d", &disciplinaIndex);
-    disciplinaIndex--;
-
-    disciplina = buscarDisciplinaIndex(list, disciplinaIndex);
-    if (disciplina == NULL) {
-        printf("\n\t═══════════════════════════════════════════\n");
-        printf("\t✘ Erro: Disciplina não encontrada!\n");
-        printf("\t═══════════════════════════════════════════\n\n");
+    disciplina = selecionarDisciplina(&list);
+    if (disciplina == NULL)
         return;
-    }
 
     printf("\n\t══════════════════════════════════════════════════\n");
     printf("\tPré-requisitos de: %s\n", disciplina->nome);
@@ -375,6 +424,191 @@ void listarPreRequisitos(TLista list) {
     }
     printf("\t══════════════════════════════════════════════════\n\n");
 }
+
+void excluirPreRequisito(TLista *list) {
+    int preReqIndex;
+    TDisciplina *disciplina;
+    TPreRequisito *current, *prev, *temp;
+    
+    disciplina = selecionarDisciplina(list);
+    if (disciplina == NULL)
+        return;
+    
+    if (disciplina->preRequisitos == NULL) {
+        printf("\n\t═══════════════════════════════════════════\n");
+        printf("\t✘ Erro: Nenhum pré-requisito cadastrado para a disciplina!\n");
+        printf("\t═══════════════════════════════════════════\n\n");
+        return;
+    }
+    
+    printf("\n\t══════════════════════════════════════════════════\n");
+    printf("\tPré-requisitos de: %s\n", disciplina->nome);
+    printf("\t══════════════════════════════════════════════════\n");
+    current = disciplina->preRequisitos;
+    int i = 1;
+    while (current != NULL) {
+        printf("\t%d. %s\n", i++, current->disciplina->nome);
+        current = current->prox;
+    }
+    printf("\t══════════════════════════════════════════════════\n\n");
+    
+    printf("\n\t► Índice do pré-requisito a excluir: ");
+    scanf("%d", &preReqIndex);
+    preReqIndex--;
+    
+    current = disciplina->preRequisitos;
+    prev = NULL;
+    i = 0;
+    while (current != NULL && i < preReqIndex) {
+        prev = current;
+        current = current->prox;
+        i++;
+    }
+    if (current == NULL) {
+        printf("\n\t═══════════════════════════════════════════\n");
+        printf("\t✘ Erro: Pré-requisito não encontrado!\n");
+        printf("\t═══════════════════════════════════════════\n\n");
+        return;
+    }
+    
+    if (prev == NULL) {
+        disciplina->preRequisitos = current->prox; // Removendo o primeiro elemento
+    } else {
+        prev->prox = current->prox;
+    }
+    
+    temp = current;
+    free(temp);
+    
+    printf("\n\t═══════════════════════════════════════════\n");
+    printf("\t✔ Pré-requisito removido com sucesso!\n");
+    printf("\t═══════════════════════════════════════════\n\n");
+}
+
+
+
+
+
+
+//===| Funções Grade curricular |==================================================
+
+
+void registrarGradeCurricular(TLista *list) {
+    int periodo;
+	TGrade *atualGrade, *novoGrade;
+	TDisciplina *disciplina;
+	TCurso *curso;
+
+    curso = selecionarCurso(list);
+    if (curso == NULL)
+        return;
+    
+    disciplina = selecionarDisciplina(list);
+    if (disciplina == NULL)
+        return;
+    
+    printf("\n\t► Informe o período para a disciplina '%s': ", disciplina->nome);
+    scanf("%d", &periodo);
+
+    novoGrade = (TGrade *)malloc(sizeof(TGrade));
+    if (novoGrade == NULL) {
+        printf("\n\tErro na alocação de memória!\n");
+        return;
+    }
+    novoGrade->disciplina = disciplina;
+    novoGrade->periodo = periodo;
+    novoGrade->prox = NULL;
+
+    if (curso->gradeCurricular == NULL) {
+        curso->gradeCurricular = novoGrade;
+    } else {
+        atualGrade = curso->gradeCurricular;
+        while (atualGrade->prox != NULL) {
+            atualGrade = atualGrade->prox;
+        }
+        atualGrade->prox = novoGrade;
+    }
+
+    printf("\n\t═══════════════════════════════════════════\n");
+    printf("\t✔ Disciplina '%s' registrada no curso '%s' no período %d!\n", 
+           disciplina->nome, curso->nome, periodo);
+    printf("\t═══════════════════════════════════════════\n\n");
+}
+
+// Função auxiliar para exibir a grade curricular de um curso
+void exibirGradeCurricular(TCurso *curso) {
+	TGrade *atualGrade;
+
+    if (curso->gradeCurricular == NULL) {
+        printf("\n\tNenhuma grade encontrada para esse curso\n");
+        return;
+    }
+
+    atualGrade = curso->gradeCurricular;
+    int i = 1;
+    printf("\n\t══════════════════════════════════════════════════\n");
+    printf("\tGrade Curricular do curso: %s\n", curso->nome);
+    printf("\t══════════════════════════════════════════════════\n");
+    while (atualGrade != NULL) {
+        printf("\t%d. %s - Período: %d\n", i, atualGrade->disciplina->nome, atualGrade->periodo);
+        atualGrade = atualGrade->prox;
+        i++;
+    }
+    printf("\t══════════════════════════════════════════════════\n\n");
+}
+
+void listarGradeCurricular(TLista list) {
+    TCurso *curso = selecionarCurso(&list);
+    if (curso == NULL)
+        return;
+    
+    exibirGradeCurricular(curso);
+}
+
+void excluirItemGradeCurricular(TLista *list) {
+    int itemIndex;
+    TCurso *curso;
+    TGrade *atual, *anterior;
+    
+    curso = selecionarCurso(list);
+    if (curso == NULL)
+        return;
+    
+    exibirGradeCurricular(curso);
+
+    printf("\n\t► Índice do item da grade a excluir: ");
+    scanf("%d", &itemIndex);
+    itemIndex--; 
+
+    anterior = NULL;
+    atual = curso->gradeCurricular;
+    int i = 0;
+    while (atual != NULL && i < itemIndex) {
+        anterior = atual;
+        atual = atual->prox;
+        i++;
+    }
+
+    if (atual == NULL) {
+        printf("\n\t═══════════════════════════════════════════\n");
+        printf("\t✘ Erro: Item não encontrado!\n");
+        printf("\t═══════════════════════════════════════════\n\n");
+        return;
+    }
+
+    if (anterior == NULL) { // Se for o primeiro item
+        curso->gradeCurricular = atual->prox;
+    } else {
+        anterior->prox = atual->prox;
+    }
+    free(atual);
+
+    printf("\n\t═══════════════════════════════════════════\n");
+    printf("\t✔ Item da grade curricular removido com sucesso!\n");
+    printf("\t═══════════════════════════════════════════\n\n");
+}
+
+
 
 int menu(){
 	int opcao;
@@ -423,13 +657,13 @@ int main(){
 			case 3: cadastroCursos(&lista); break;
 			case 4: excluirCurso(&lista); break;
 			case 5: registrarPreRequisitos(&lista); break;
-			case 6: break;
-			case 7: break;
-			case 8: break;
+			case 6: excluirPreRequisito(&lista); break;
+			case 7: registrarGradeCurricular(&lista); break;
+			case 8: excluirItemGradeCurricular(&lista);
 			case 9: listarDisciplinas(lista); break;
 			case 10: listarCursos(lista); break;
 			case 11: listarPreRequisitos(lista); break;
-			case 12: break;
+			case 12: listarGradeCurricular(lista);
 
 		}
 	}while(opcao != 0);
