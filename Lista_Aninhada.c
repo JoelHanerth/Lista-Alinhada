@@ -4,8 +4,8 @@
    
    Trabalho em Dupla:
    
-   (1).....................................................
-   (2).....................................................
+   (1) Joel Hanerth
+   (2) Lucas Zanetti Zanotelli
    
 */
 #include <stdlib.h>
