@@ -173,6 +173,7 @@ void cadastroDisciplinas(TLista *list){
 			atual = atual->prox;
 		}
 		novo->ant = atual;
+		
 		atual->prox = novo;
 	}
 
@@ -180,6 +181,34 @@ void cadastroDisciplinas(TLista *list){
 	printf("\t✔ Disciplina cadastrada com sucesso!\n");
 	printf("\t═══════════════════════════════════════════\n\n");
 	listarDisciplinas(*list);
+}
+
+void excluirDisciplinaGrade(TLista *list, TDisciplina *disciplina) {
+    TCurso *curso = list->cursos;
+
+    while (curso != NULL) {
+        TGrade *atual = curso->gradeCurricular;
+        TGrade *anterior = NULL;
+
+        while (atual != NULL) {
+
+            if (atual->disciplina == disciplina) {
+                if (anterior == NULL) { // é o primeiro elemento da grade
+                    curso->gradeCurricular = atual->prox;
+                } else {
+                    anterior->prox = atual->prox;
+                }
+                TGrade *temp = atual;
+                atual = atual->prox;
+                free(temp);
+                
+            } else {
+                anterior = atual;
+                atual = atual->prox;
+            }
+        }
+        curso = curso->prox;
+    }
 }
 
 
@@ -194,7 +223,6 @@ void excluirDisciplina(TLista *list){
 
 	if (index == 0 && list->disciplinas!=NULL) {
 		list->disciplinas = atual->prox;
-		free(atual);
 
 	} else {
 		for (i = 0; i < index && atual != NULL; i++) {
@@ -209,15 +237,15 @@ void excluirDisciplina(TLista *list){
 		}
 		if (atual->prox == NULL){
 			atual->ant->prox = NULL;
-			free(atual);
 		}
 		else{
 			atual->ant->prox = atual->prox;
 			atual->prox->ant = atual->ant;
-			free(atual);
 		}
 	}
 
+    excluirDisciplinaGrade(list,atual);
+    free(atual);
 	printf("\n\t═══════════════════════════════════════════\n");
 	printf("\t✔ Disciplina removida com sucesso!\n");
 	printf("\t═══════════════════════════════════════════\n\n");
@@ -225,7 +253,8 @@ void excluirDisciplina(TLista *list){
 }
 
 
-void cadastroDisciplinas2(TLista *list, char nome[100], int carga){
+
+void cadastroDisciplinaParamentro(TLista *list, char nome[100], int carga){
 	TDisciplina *novo, *atual;
 
 	novo = (TDisciplina *)malloc(sizeof(TDisciplina));
@@ -323,7 +352,7 @@ void excluirCurso(TLista *list) {
 }
 
 
-void cadastroCursos2(TLista *list, char nome[100]){
+void cadastroCursoParamentro(TLista *list, char nome[100]){
 	TCurso *novo, *atual;
 
 	novo = (TCurso *)malloc(sizeof(TCurso));
@@ -511,10 +540,6 @@ void registrarGradeCurricular(TLista *list) {
     scanf("%d", &periodo);
 
     novoGrade = (TGrade *)malloc(sizeof(TGrade));
-    if (novoGrade == NULL) {
-        printf("\n\tErro na alocação de memória!\n");
-        return;
-    }
     novoGrade->disciplina = disciplina;
     novoGrade->periodo = periodo;
     novoGrade->prox = NULL;
@@ -641,12 +666,12 @@ int main(){
 
 	inicializa(&lista);
 
-	cadastroDisciplinas2(&lista,"Introdução à Programação",60);
-	cadastroDisciplinas2(&lista,"Estrutura de Dados",90);
-	cadastroDisciplinas2(&lista,"Banco de Dados",120);
+	cadastroDisciplinaParamentro(&lista,"Introdução à Programação",60);
+	cadastroDisciplinaParamentro(&lista,"Estrutura de Dados",90);
+	cadastroDisciplinaParamentro(&lista,"Banco de Dados",120);
 
-	cadastroCursos2(&lista, "Sistemas de Informação");
-	cadastroCursos2(&lista, "Administração");
+	cadastroCursoParamentro(&lista, "Sistemas de Informação");
+	cadastroCursoParamentro(&lista, "Administração");
 	
 	do{
 		opcao = menu();

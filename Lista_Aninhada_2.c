@@ -119,7 +119,7 @@ void cadastroDisciplinas(TLista *list){
 
 }
 
-void cadastroDisciplinas2(TLista *list, char nome[100], int carga){
+void cadastroDisciplinaParamentro(TLista *list, char nome[100], int carga){
 	TDisciplina *novo, *atual;
 	printf("\n\n\t\t=======| Cadastro de DISCILINAS|=======\n\n");
 
@@ -205,7 +205,7 @@ void cadastroCursos(TLista *list){
 	printf("\n\n\tCurso cadastrado com sucesso!\n\n");
 }
 
-void cadastroCursos2(TLista *list, char nome[100]){
+void cadastroCursoParamentro(TLista *list, char nome[100]){
 	TCurso *novo, *atual;
 	printf("\n\n\t\t=======| Cadastro de CURSOS |=======\n\n");
 
@@ -404,14 +404,14 @@ int main(){
 
 	inicializa(&lista);
 
-	cadastroDisciplinas2(&lista,"a",60);
-	cadastroDisciplinas2(&lista,"b",90);
-	cadastroDisciplinas2(&lista,"c",120);
+	cadastroDisciplinaParamentro(&lista,"a",60);
+	cadastroDisciplinaParamentro(&lista,"b",90);
+	cadastroDisciplinaParamentro(&lista,"c",120);
 
 	listarDisciplinas(lista);
 
-	cadastroCursos2(&lista, "SI");
-	cadastroCursos2(&lista, "ADM");
+	cadastroCursoParamentro(&lista, "SI");
+	cadastroCursoParamentro(&lista, "ADM");
 	listarCursos(lista);
 
 
